@@ -1,5 +1,5 @@
 {
-  "name": "bony",
+  "name": "bony-soup",
   "version": "1.0.0",
   "description": "Backbone data diff reactive view rendering.",
   "main": "index.js",
@@ -12,8 +12,17 @@
   "license": "MIT",
   "dependencies": {
     "backbone": "^1.2.2",
+    "bony": "^1.0.0",
+    "handlebars": "^3.0.3",
     "jquery": "^2.1.4",
-    "underscore": "^1.8.3",
-    "handlebars": "^3.0.3"
-  }
+    "underscore": "^1.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aabmar/bony-soup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aabmar/bony-soup/issues"
+  },
+  "homepage": "https://github.com/aabmar/bony-soup#readme"
 }
