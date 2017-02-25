@@ -1,47 +1,23 @@
-// var Component = require("../../Component");
-var Input = require("./Input");
+/*jshint browserify: true */
+"use strict";
 
-/**
- * TextArea class. When clicked, it triggers a "click" event.
- *
- * Options:
- *
- * - template: Template to render or text to show
- * - key: variable to give as parameter on click event. (Optional)
- */
-module.exports = Input.extend({
-    tagName: "textarea",
-    className: "form-input",
-    template: "x",
-    events:{
-        "change": "domChange"
+var bony = require("bony");
+var Handlebars = require("handlebars");
+var FieldBlock = require("./FieldBlock");
+
+var Component = bony.Component;
+
+module.exports  = FieldBlock.extend({
+    initialize: function(options, args) {
+        FieldBlock.prototype.initialize.call(this, options);
+        var name = this.attributes.name;
+
+        var tpl = `
+            <label for="{{cid}}">{{label}}</label>
+            <textarea id="{{cid}}" type="{{type}}" name="${this.data.name}" {{#disabled}}disabled{{/disabled}}>${this.model.get(this.data.name)||""}</textarea>
+        `;
+        this.template = Handlebars.compile(tpl);
     },
 
-    initialize: function(options){
-        Input.prototype.initialize.call(this, options);
-        var value = this.model.get(this.options.field);
-        this.template = value || " ";
-    },
-
-    // domChange: function(e){
-    //     var value = $(e.currentTarget).val();
-    //     this.model.set(this.options.field, value);
-    //     if(this.options.autoSave) this.model.save();
-    // },
-
-    // modelChange: function(e){
-    //     var value = this.model.get(this.options.field);
-    //     var me = this;
-    //     this.dirty(function(){
-    //         me.$el.val(value);    
-    //     });        
-    // },
-
-    // clean: function(){
-    //     var me = this;
-    //     this.trigger("sync", this.model, this.options.field);
-    //     this.dirty(function(){
-    //         me.$el.removeClass("dirty");
-    //     });
-    // }
 });
+

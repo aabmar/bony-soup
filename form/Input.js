@@ -1,50 +1,19 @@
-var Component = require("../../Component");
+/*jshint browserify: true */
+"use strict";
 
-/**
- * A simple button class. When clicked, it triggers a "click" event.
- *
- * Options:
- *
- * - template: Template to render or text to show
- * - key: variable to give as parameter on click event. (Optional)
- */
-module.exports = Component.extend({
-    tagName: "input",
-    className: "form-input",
-    template: "x",
-    events:{
-        "change": "domChange"
-    },
+var bony = require("bony");
+var Handlebars = require("handlebars");
+var FieldBlock = require("./FieldBlock");
 
-    initialize: function(options){
-        Component.prototype.initialize.call(this, options);
-        if(!this.model) throw new Error("Input must have option 'model'.");
-        if(!this.options.field) throw new Error("Input must have option 'field'.");
-        this.label = this.options.label || this.options.field;
-        this.listenTo(this.model, "change:" + this.options.field, this.modelChange);
-        this.modelChange();
+module.exports = FieldBlock.extend({
+    initialize: function(options, args) {
+        FieldBlock.prototype.initialize.call(this, options);
+        var name = this.attributes.name;
 
-    },
-
-    domChange: function(e){
-        var value = $(e.currentTarget).val();
-        this.model.set(this.options.field, value);
-        if(this.options.autoSave) this.model.save();
-    },
-
-    modelChange: function(e){
-        var value = this.model.get(this.options.field);
-        var me = this;
-        this.dirty(function(){
-            me.$el.val(value);    
-        });        
-    },
-
-    clean: function(){
-        var me = this;
-        this.trigger("sync", this.model, this.options.field);
-        this.dirty(function(){
-            me.$el.removeClass("dirty");
-        });
+        var tpl = `
+            <label for="{{cid}}">{{label}}</label>
+            <input id="{{cid}}" type="{{type}}" name="${this.data.name}" value = "${this.model.get(this.data.name)||""}" {{#disabled}}disabled{{/disabled}}/>
+        `;
+        this.template = Handlebars.compile(tpl);
     }
 });

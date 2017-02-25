@@ -1,54 +1,43 @@
-var Component = require("../../Component");
+/*jshint browserify: true */
+"use strict";
+
+var bony = require("bony");
+var Handlebars = require("handlebars");
 var moment = require("moment");
-/**
- * A simple button class. When clicked, it triggers a "click" event.
- *
- * Options:
- *
- * - template: Template to render or text to show
- * - key: variable to give as parameter on click event. (Optional)
- */
-module.exports = Component.extend({
-    tagName: "input",
-    className: "form-input",
-    template: "x",
-    events:{
-        "change": "domChange"
+var FieldBlock = require("./FieldBlock");
+
+module.exports = FieldBlock.extend({
+    initialize: function(options, args) {
+        FieldBlock.prototype.initialize.call(this, options);
+        var name = this.attributes.name;
+        var tpl = `
+            <label for="{{cid}}">{{label}}</label>
+            <input id="{{cid}}" type="text" name="${this.data.name}" value = "${moment(this.model.get(this.data.name)).format("DD.MM.YYYY HH:mm")||""}" {{#disabled}}disabled{{/disabled}}/>
+        `;
+        this.template = Handlebars.compile(tpl);
     },
-    attributes: {
-        type: "date"
+    // Set changes from HTML to model
+    formChange: function(e) {
+        // Check that we have a target
+        if (!e || !e.target) return;
+
+        // Apply the change to the model
+        var name = this.attributes.name;
+        var val = e.target.value;
+
+        if (this.data.validation) {
+            var valid = this.data.validation.test(val);
+            if (valid) this.$el.removeClass("error");
+            else {
+                this.$el.addClass("error");
+                return;
+            }
+        }
+
+        if(val) val = moment(val, "DD.MM.YYYY HH:mm").toISOString();
+        this.model.set(name, val);
+
+        return this;
     },
 
-    initialize: function(options){
-        Component.prototype.initialize.call(this, options);
-        if(!this.model) throw new Error("Input must have option 'model'.");
-        if(!this.options.field) throw new Error("Input must have option 'field'.");
-        this.label = this.options.label || this.options.field;
-        this.listenTo(this.model, "change:" + this.options.field, this.modelChange);
-        this.modelChange();
-    },
-
-    domChange: function(e){
-        var value = $(e.currentTarget).val();
-        var m = moment(value, "YYYY-MM-DD").toISOString();
-        this.model.set(this.options.field, m);
-        if(this.options.autoSave) this.model.save();
-    },
-
-    modelChange: function(e){
-        var value = this.model.get(this.options.field);
-        var m = moment(value).format("YYYY-MM-DD");
-        var me = this;
-        this.dirty(function(){
-            me.$el.val(m);    
-        });        
-    },
-
-    clean: function(){
-        var me = this;
-        this.trigger("sync", this.model, this.options.field);
-        this.dirty(function(){
-            me.$el.removeClass("dirty");
-        });
-    }
 });
